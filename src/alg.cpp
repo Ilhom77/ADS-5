@@ -91,7 +91,7 @@ int eval(std::string pref) {
   std::string number = "0123456789";
   std::string operation = "()+-*/";
   for (int i = 0; i < pref.length(); ++i) {
-    if (search(number, pref[i])) {
+    if (search(number, pref[i])) 
       Stack.push(pref[i] - '0');
     } else if (search(operation, pref[i])) {
       int a = 0, b = 0;
