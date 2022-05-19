@@ -1,4 +1,4 @@
-// Copyright 2022 NNTU-CS
+// Copyright 2021 NNTU-CS
 #include <string>
 #include <map>
 #include <stack>
@@ -57,6 +57,7 @@ std::string infx2pstfx(std::string s) {
     }
     return st;
 }
+
 int eval(std::string s) {
     std::string p;
     std::stack<int> Stack;
