@@ -1,8 +1,7 @@
-// Copyright 2021 NNTU-CS
+// Copyright 2022 NNTU-CS
 #include <string>
 #include <map>
 #include <stack>
-
 int check(char i) {
     if (i == '/' || i == '*') {
         return 3;
@@ -12,7 +11,6 @@ int check(char i) {
         return 1;
     }
 }
-
 std::string infx2pstfx(std::string s) {
     std::string st = "";
     std::stack<char> Stack;
@@ -57,7 +55,6 @@ std::string infx2pstfx(std::string s) {
     }
     return st;
 }
-
 int eval(std::string s) {
     std::string p;
     std::stack<int> Stack;
