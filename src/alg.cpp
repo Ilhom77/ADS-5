@@ -1,95 +1,80 @@
-// Copyright 2022 NNTU-CS
+// Copyright 2021 NNTU-CS
 #include <string>
 #include <map>
-#include <stack>
-int check(char i) {
-    if (i == '/' || i == '*') {
-        return 3;
-    } else if (i == '+' || i == '-') {
-        return 2;
-    } else {
-        return 1;
+#include "tstack.h"
+int priority(char alt) {
+    switch (alt) {
+    case '(': return 0;
+    case ')': return 1;
+    case '-': case '+': return 2;
+    case '*': case '/': return 3;
+    default: return 4;
     }
 }
-std::string infx2pstfx(std::string s) {
-    std::string st = "";
-    std::stack<char> Stack;
-    for (int i = 0; i < s.length(); i++) {
-        char ch = s[i];
-        if ((ch >= '0' && ch <= '9')) {
-            st += ch;
-            for (int j = i + 1; j < s.length(); j++) {
-                if ((s[j] >= '0' && s[j] <= '9')) {
-                    i += 1;
-                    st += s[j];
-                } else {
-                    break;
-                }
-            }
-            st += " ";
-        } else if (ch == '(') {
-            Stack.push('(');
-        } else if (ch == ')') {
-            while (Stack.top() != '(') {
-                st += Stack.top();
-                st += " ";
-                Stack.pop();
-            }
-            Stack.pop();
+int count(int i, int j, char sum) {
+    switch (sum) {
+    case '-': return i - j;
+    case '+': return i + j;
+    case '*': return i * j;
+    case '/': return i / j;
+    default: return 0;
+    }
+}
+std::string infx2pstfx(std::string inf) {
+  TStack <char, 100> stack;
+    int vari;
+    std::string str;
+  for (int i = 0; i < inf.size(); i++) {
+        vari = priority(inf[i]);
+        if (vari == 4) {
+            str.push_back(inf[i]);
+            str.push_back(' ');
         } else {
-            while (!Stack.empty() && check(s[i]) <= check(Stack.top())) {
-                st += Stack.top();
-                st += " ";
-                Stack.pop();
-            }
-            Stack.push(ch);
-        }
-    }
-    while (!Stack.empty()) {
-        st += Stack.top();
-        st += " ";
-        Stack.pop();
-    }
-    if (st[st.length() - 1] == ' ') {
-        st.pop_back();
-    }
-    return st;
-}
-int eval(std::string s) {
-    std::string p;
-    std::stack<int> Stack;
-    for (int i = 0; i < s.length(); ++i) {
-        p = "";
-        if ((s[i] >= '0' && s[i] <= '9')) {
-            p += s[i];
-            for (int j = i + 1; j < s.length(); j++) {
-                if ((s[j] >= '0' && s[j] <= '9')) {
-                    i += 1;
-                    p += s[j];
-                } else {
-                    break;
+            if (((vari == 0) || stack.isEmpty())) {
+                stack.push(inf[i]);
+            } else if ((vari > priority(stack.get()))) {
+                stack.push(inf[i]);
+            } else if (vari == 1) {
+                while (stack.get() != '(') {
+                    str.push_back(stack.get());
+                    str.push_back(' ');
+                    stack.pop();
                 }
-            }
-            Stack.push(std::stoi(p));
-        } else if (s[i] != ' ') {
-            int first, second;
-            first = Stack.top();
-            Stack.pop();
-            second = Stack.top();
-            Stack.pop();
-            if (s[i] == '+') {
-                Stack.push(second + first);
-            }
-            if (s[i] == '-') {
-                Stack.push(second - first);
-            }
-            if (s[i] == '*') {
-                Stack.push(second * first);
-            }
-            if (s[i] == '/') {
-                Stack.push(second / first);
+                stack.pop();
+            } else if (inf[i] != ' ') {
+                int vrp = priority(stack.get());
+                while ((vrp >= priority(inf[i])) && (!stack.isEmpty())) {
+                    str.push_back(stack.get());
+                    str.push_back(' ');
+                    stack.pop();
+                }
+                stack.push(inf[i]);
             }
         }
     }
-    return Stack.top();
+  while (!stack.isEmpty()) {
+        str.push_back(stack.get());
+        str.push_back(' ');
+        stack.pop();
+    }
+    if (str[str.size() - 1] == ' ') {
+        str.erase(str.size() - 1);
+    }
+    return str;
+}
+int eval(std::string prior) {
+  TStack <int, 100> stack;
+  int x, y;
+  for (int i = 0; i < prior.size(); i++) {
+      if (priority(prior[i]) < 4) {
+          y = stack.get();
+          stack.pop();
+          x = stack.get();
+          stack.pop();
+          stack.push(count(x, y, prior[i]));
+      } else if (prior[i] != ' ' && priority(prior[i]) == 4) {
+          stack.push(prior[i] - '0');
+      }
+  }
+  return stack.get();
 }
